@@ -2,10 +2,10 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import './FeatureCard.css';
 
-const FeatureCard = ({ icon, title, description }) => {
+const FeatureCard = ({ icon, title, description, isSearching }) => {
   return (
     <motion.div
-      className="feature-card"
+      className={`feature-card ${isSearching ? 'searching-glow' : ''}`}
       whileHover={{ y: -10, scale: 1.02 }}
       transition={{ type: 'spring', stiffness: 300 }}
     >

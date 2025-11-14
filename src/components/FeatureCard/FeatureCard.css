@@ -9,6 +9,10 @@
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 320px;
+  height: 100%;
 }
 
 .feature-card::before {
@@ -67,4 +71,32 @@
   font-size: 1.05rem;
   color: var(--text-secondary);
   line-height: 1.6;
+  flex: 1;
+}
+
+/* Subtle golden glow effect when searching */
+.feature-card.searching-glow {
+  border-color: rgba(251, 191, 36, 0.5);
+  box-shadow: 0 0 15px rgba(251, 191, 36, 0.3),
+    0 0 25px rgba(251, 191, 36, 0.2);
+  animation: goldenPulse 2s ease-in-out infinite;
+}
+
+.feature-card.searching-glow::before {
+  background: radial-gradient(circle at top right, rgba(251, 191, 36, 0.15), transparent 70%);
+  opacity: 1;
+}
+
+@keyframes goldenPulse {
+
+  0%,
+  100% {
+    box-shadow: 0 0 15px rgba(251, 191, 36, 0.3),
+      0 0 25px rgba(251, 191, 36, 0.2);
+  }
+
+  50% {
+    box-shadow: 0 0 20px rgba(251, 191, 36, 0.4),
+      0 0 35px rgba(251, 191, 36, 0.25);
+  }
 }

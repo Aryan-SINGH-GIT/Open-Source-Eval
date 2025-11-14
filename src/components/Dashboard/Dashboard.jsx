@@ -33,7 +33,7 @@ const Dashboard = () => {
     // So: MW = GWh/year × 0.11416
     // The API returns cityConsumption in GWh per year
     let consumptionMW = 1200; // Default fallback
-    
+
     if (energyData.cityConsumption) {
       // Convert GWh/year to MW: (GWh/year × 1,000,000 kWh/GWh) / (8,760 hours/year) = GWh/year × 0.11416
       consumptionMW = Math.round(energyData.cityConsumption * 0.11416);
@@ -43,7 +43,7 @@ const Dashboard = () => {
 
     // Renewable percentage - not available from API, use estimated value based on Indian average
     const renewablePercentage = 35 + Math.floor(Math.random() * 15); // 35-50% range
-    
+
     // Peak load - estimate as 1.2x of current consumption
     const peakLoad = Math.round(consumptionMW * 1.2);
 
@@ -323,7 +323,7 @@ const Dashboard = () => {
             <input
               type="text"
               className="search-input"
-              placeholder="Search for a city... (e.g., New York, London, Tokyo)"
+              placeholder="Search your city"
               value={searchCity}
               onChange={(e) => setSearchCity(e.target.value)}
             />
@@ -392,19 +392,19 @@ const Dashboard = () => {
             exit="hidden"
           >
             <div className="widgets-grid">
-              <motion.div variants={itemVariants}>
+              <motion.div variants={itemVariants} key={`weather-${selectedCity}`}>
                 <WeatherWidget weather={cityData.weather} cityName={selectedCity} />
               </motion.div>
-              <motion.div variants={itemVariants}>
+              <motion.div variants={itemVariants} key={`air-${selectedCity}`}>
                 <AirQualityWidget data={cityData.airQuality} />
               </motion.div>
-              <motion.div variants={itemVariants}>
+              <motion.div variants={itemVariants} key={`traffic-${selectedCity}`}>
                 <TrafficWidget data={cityData.traffic} />
               </motion.div>
-              <motion.div variants={itemVariants}>
+              <motion.div variants={itemVariants} key={`energy-${selectedCity}`}>
                 <EnergyWidget data={cityData.energy} />
               </motion.div>
-              <motion.div variants={itemVariants}>
+              <motion.div variants={itemVariants} key={`waste-${selectedCity}`}>
                 <WasteWidget data={cityData.waste} />
               </motion.div>
             </div>
