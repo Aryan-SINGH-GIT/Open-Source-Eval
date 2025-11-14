@@ -47,9 +47,10 @@ const Dashboard = () => {
     if (searchCity.trim()) {
       setLoading(true);
       try {
-        // Import the weather and traffic APIs
+        // Import the weather, traffic, and waste APIs
         const { getCurrentWeather } = await import('../../services/weatherAPI');
         const { getTrafficFlow } = await import('../../services/trafficAPI');
+        const { getWasteData } = await import('../../services/wasteAPI');
 
         // Fetch real weather data
         const weatherData = await getCurrentWeather(searchCity);
@@ -65,6 +66,19 @@ const Dashboard = () => {
             freeFlowSpeed: 60,
             currentTravelTime: 600,
             freeFlowTravelTime: 400
+          };
+        }
+
+        // Fetch real waste management data
+        let wasteData;
+        try {
+          wasteData = await getWasteData(searchCity);
+        } catch (error) {
+          console.warn('Waste data not available for this city, using mock data');
+          wasteData = {
+            collectedToday: 450 + Math.floor(Math.random() * 100),
+            recyclingRate: 30 + Math.floor(Math.random() * 15),
+            nextCollection: 'Tomorrow, 6:00 AM'
           };
         }
 
@@ -103,9 +117,13 @@ const Dashboard = () => {
             peak: 1500 + Math.floor(Math.random() * 200)
           },
           waste: {
-            collected: 450 + Math.floor(Math.random() * 100),
-            recycled: 30 + Math.floor(Math.random() * 15),
-            nextCollection: 'Tomorrow, 6:00 AM'
+            collected: wasteData.collectedToday || 450,
+            recycled: wasteData.recyclingRate || 30,
+            nextCollection: wasteData.nextCollection || 'Tomorrow, 6:00 AM',
+            binFillLevel: wasteData.binFillLevel || 65,
+            dailyTarget: wasteData.dailyTarget || 10000,
+            collectionProgress: wasteData.collectionProgress || 75,
+            collectionStatus: wasteData.collectionStatus || 'Collection in progress'
           }
         });
       } catch (error) {
