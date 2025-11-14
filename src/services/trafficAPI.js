@@ -40,7 +40,9 @@ export const getTrafficFlow = async (city) => {
 
     const data = await response.json();
     
-    return {
+    console.log('✅ Traffic API Response for', city, ':', data.flowSegmentData);
+    
+    const trafficData = {
       city,
       currentSpeed: data.flowSegmentData?.currentSpeed || 0,
       freeFlowSpeed: data.flowSegmentData?.freeFlowSpeed || 0,
@@ -51,6 +53,10 @@ export const getTrafficFlow = async (city) => {
       coordinates: { lat, lon },
       timestamp: new Date().toISOString()
     };
+    
+    console.log('📊 Processed Traffic Data:', trafficData);
+    
+    return trafficData;
   } catch (error) {
     console.error('Error fetching traffic data:', error);
     throw error;

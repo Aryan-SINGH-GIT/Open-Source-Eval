@@ -87,11 +87,15 @@ const Dashboard = () => {
             pm10: 25 + Math.floor(Math.random() * 30)
           },
           traffic: {
-            congestionLevel: Math.round((trafficData.currentSpeed / trafficData.freeFlowSpeed) * 100),
-            avgSpeed: trafficData.currentSpeed,
+            congestionLevel: trafficData.freeFlowSpeed > 0 
+              ? Math.round((trafficData.currentSpeed / trafficData.freeFlowSpeed) * 100)
+              : 50,
+            avgSpeed: trafficData.currentSpeed || 35,
             incidents: Math.floor(Math.random() * 5),
-            freeFlowSpeed: trafficData.freeFlowSpeed,
-            delay: Math.round((trafficData.currentTravelTime - trafficData.freeFlowTravelTime) / 60)
+            freeFlowSpeed: trafficData.freeFlowSpeed || 60,
+            delay: trafficData.currentTravelTime && trafficData.freeFlowTravelTime
+              ? Math.round((trafficData.currentTravelTime - trafficData.freeFlowTravelTime) / 60)
+              : 0
           },
           energy: {
             usage: 1200 + Math.floor(Math.random() * 300),
