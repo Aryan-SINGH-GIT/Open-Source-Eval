@@ -47,11 +47,26 @@ const Dashboard = () => {
     if (searchCity.trim()) {
       setLoading(true);
       try {
-        // Import the weather API
+        // Import the weather and traffic APIs
         const { getCurrentWeather } = await import('../../services/weatherAPI');
+        const { getTrafficFlow } = await import('../../services/trafficAPI');
 
         // Fetch real weather data
         const weatherData = await getCurrentWeather(searchCity);
+        
+        // Fetch real traffic data
+        let trafficData;
+        try {
+          trafficData = await getTrafficFlow(searchCity);
+        } catch (error) {
+          console.warn('Traffic data not available for this city, using mock data');
+          trafficData = {
+            currentSpeed: 35 + Math.floor(Math.random() * 25),
+            freeFlowSpeed: 60,
+            currentTravelTime: 600,
+            freeFlowTravelTime: 400
+          };
+        }
 
         setSelectedCity(searchCity);
         setCityData({
@@ -72,9 +87,15 @@ const Dashboard = () => {
             pm10: 25 + Math.floor(Math.random() * 30)
           },
           traffic: {
-            congestionLevel: 40 + Math.floor(Math.random() * 40),
-            avgSpeed: 35 + Math.floor(Math.random() * 25),
-            incidents: Math.floor(Math.random() * 5)
+            congestionLevel: trafficData.freeFlowSpeed > 0 
+              ? Math.round((trafficData.currentSpeed / trafficData.freeFlowSpeed) * 100)
+              : 50,
+            avgSpeed: trafficData.currentSpeed || 35,
+            incidents: Math.floor(Math.random() * 5),
+            freeFlowSpeed: trafficData.freeFlowSpeed || 60,
+            delay: trafficData.currentTravelTime && trafficData.freeFlowTravelTime
+              ? Math.round((trafficData.currentTravelTime - trafficData.freeFlowTravelTime) / 60)
+              : 0
           },
           energy: {
             usage: 1200 + Math.floor(Math.random() * 300),
