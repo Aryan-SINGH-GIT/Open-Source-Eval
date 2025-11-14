@@ -1,0 +1,114 @@
+.app {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  padding: 20px;
+}
+
+.app-header {
+  text-align: center;
+  color: white;
+  margin-bottom: 30px;
+  padding: 20px;
+}
+
+.app-header h1 {
+  font-size: 48px;
+  margin: 0;
+  font-weight: 700;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.app-header p {
+  font-size: 18px;
+  margin: 10px 0 0 0;
+  opacity: 0.9;
+}
+
+.city-selector {
+  max-width: 500px;
+  margin: 0 auto 30px;
+}
+
+.city-selector form {
+  display: flex;
+  gap: 10px;
+}
+
+.city-input {
+  flex: 1;
+  padding: 15px 20px;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  outline: none;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.search-btn {
+  padding: 15px 30px;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.search-btn:hover {
+  background: #764ba2;
+  transform: translateY(-2px);
+  box-shadow: 0 7px 20px rgba(0, 0, 0, 0.3);
+}
+
+.quick-cities {
+  text-align: center;
+  margin-top: 30px;
+  color: white;
+}
+
+.quick-cities p {
+  margin-bottom: 15px;
+  font-size: 16px;
+  opacity: 0.9;
+}
+
+.quick-cities button {
+  margin: 5px;
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.quick-cities button:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+  .app-header h1 {
+    font-size: 32px;
+  }
+
+  .city-selector {
+    padding: 0 10px;
+  }
+
+  .city-selector form {
+    flex-direction: column;
+  }
+
+  .quick-cities button {
+    display: block;
+    width: 200px;
+    margin: 10px auto;
+  }
+}
