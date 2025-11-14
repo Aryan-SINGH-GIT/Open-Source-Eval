@@ -6,6 +6,7 @@ import AirQualityWidget from '../../components/AirQualityWidget/AirQualityWidget
 import TrafficWidget from '../../components/TrafficWidget/TrafficWidget';
 import EnergyWidget from '../../components/EnergyWidget/EnergyWidget';
 import WasteWidget from '../../components/WasteWidget/WasteWidget';
+import { airQualityAPI, energyAPI } from '../../services/api';
 import './Dashboard.css';
 
 const Dashboard = () => {
@@ -13,6 +14,45 @@ const Dashboard = () => {
   const [selectedCity, setSelectedCity] = useState(null);
   const [cityData, setCityData] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  // Helper function to get AQI status from AQI value
+  const getAQIStatus = (aqi) => {
+    if (aqi <= 50) return 'Good';
+    if (aqi <= 100) return 'Moderate';
+    if (aqi <= 150) return 'Unhealthy for Sensitive Groups';
+    if (aqi <= 200) return 'Unhealthy';
+    if (aqi <= 300) return 'Very Unhealthy';
+    return 'Hazardous';
+  };
+
+  // Helper function to transform energy API data to widget format
+  const transformEnergyData = (energyData) => {
+    // Convert GWh/year to MW (average power)
+    // Formula: 1 GWh/year = 1,000,000 kWh/year
+    // Average power = 1,000,000 kWh / 8,760 hours = 114.16 kW = 0.11416 MW
+    // So: MW = GWh/year × 0.11416
+    // The API returns cityConsumption in GWh per year
+    let consumptionMW = 1200; // Default fallback
+    
+    if (energyData.cityConsumption) {
+      // Convert GWh/year to MW: (GWh/year × 1,000,000 kWh/GWh) / (8,760 hours/year) = GWh/year × 0.11416
+      consumptionMW = Math.round(energyData.cityConsumption * 0.11416);
+    } else if (energyData.totalConsumption) {
+      consumptionMW = Math.round(energyData.totalConsumption * 0.11416);
+    }
+
+    // Renewable percentage - not available from API, use estimated value based on Indian average
+    const renewablePercentage = 35 + Math.floor(Math.random() * 15); // 35-50% range
+    
+    // Peak load - estimate as 1.2x of current consumption
+    const peakLoad = Math.round(consumptionMW * 1.2);
+
+    return {
+      usage: consumptionMW,
+      renewable: renewablePercentage,
+      peak: peakLoad
+    };
+  };
 
   const features = [
     {
@@ -49,59 +89,167 @@ const Dashboard = () => {
       try {
         // Import the weather and traffic APIs
         const { getCurrentWeather } = await import('../../services/weatherAPI');
-        const { getTrafficFlow } = await import('../../services/trafficAPI');
+        const { getTrafficFlow, getTrafficIncidents, getFallbackTrafficData } = await import('../../services/trafficAPI');
 
-        // Fetch real weather data
-        const weatherData = await getCurrentWeather(searchCity);
-        
-        // Fetch real traffic data
-        let trafficData;
+        // Fetch all data in parallel for better performance
+        const [weatherData, airQualityData, trafficDataResult, trafficIncidentsResult] = await Promise.allSettled([
+          getCurrentWeather(searchCity),
+          airQualityAPI.getAirQualityByCity(searchCity),
+          getTrafficFlow(searchCity).catch(() => null),
+          getTrafficIncidents(searchCity).catch(() => null)
+        ]);
+
+        // Extract weather data
+        let weather = null;
+        if (weatherData.status === 'fulfilled') {
+          weather = {
+            temp: weatherData.value.temperature,
+            condition: weatherData.value.description,
+            humidity: weatherData.value.humidity,
+            windSpeed: weatherData.value.windSpeed,
+            feelsLike: weatherData.value.feelsLike,
+            pressure: weatherData.value.pressure
+          };
+        } else {
+          throw new Error('Failed to fetch weather data');
+        }
+
+        // Extract air quality data
+        let airQuality = null;
+        let stateName = null;
+        if (airQualityData.status === 'fulfilled') {
+          const aqData = airQualityData.value;
+          airQuality = {
+            aqi: aqData.aqi || 0,
+            status: getAQIStatus(aqData.aqi || 0),
+            pm25: aqData.pollutants?.find(p => p.code === 'PM2.5')?.value || 0,
+            pm10: aqData.pollutants?.find(p => p.code === 'PM10')?.value || 0
+          };
+          // Extract state name from location for energy API
+          stateName = aqData.location?.admin1 || null;
+        } else {
+          console.warn('Air quality data not available, using fallback');
+          airQuality = {
+            aqi: 50,
+            status: 'Moderate',
+            pm25: 20,
+            pm10: 30
+          };
+        }
+
+        // Extract traffic data
+        let traffic = null;
+        let trafficData = null;
+        let incidentsCount = 0;
+
+        // Get traffic flow data (real API or fallback)
+        if (trafficDataResult.status === 'fulfilled' && trafficDataResult.value) {
+          trafficData = trafficDataResult.value;
+        } else {
+          console.warn('Traffic API not available, using city-specific fallback data');
+          trafficData = getFallbackTrafficData(searchCity);
+        }
+
+        // Get traffic incidents count
+        if (trafficIncidentsResult.status === 'fulfilled' && trafficIncidentsResult.value) {
+          incidentsCount = trafficIncidentsResult.value.incidentCount || 0;
+        } else if (trafficData.isFallback && trafficData.incidents !== undefined) {
+          // Use fallback incidents from the pattern
+          incidentsCount = trafficData.incidents;
+        } else {
+          // Default fallback
+          incidentsCount = 5;
+        }
+
+        // Calculate congestion level correctly
+        // Congestion = 100 - (currentSpeed / freeFlowSpeed) * 100
+        // When speed is low, congestion is high
+        let congestionLevel = 50; // Default
+        if (trafficData.freeFlowSpeed > 0 && trafficData.currentSpeed > 0) {
+          const speedRatio = trafficData.currentSpeed / trafficData.freeFlowSpeed;
+          // Congestion is inverse of speed ratio
+          congestionLevel = Math.round((1 - speedRatio) * 100);
+          // Clamp between 0 and 100
+          congestionLevel = Math.max(0, Math.min(100, congestionLevel));
+        }
+
+        traffic = {
+          congestionLevel,
+          avgSpeed: trafficData.currentSpeed || 30,
+          incidents: incidentsCount,
+          freeFlowSpeed: trafficData.freeFlowSpeed || 55,
+          delay: trafficData.currentTravelTime && trafficData.freeFlowTravelTime
+            ? Math.round((trafficData.currentTravelTime - trafficData.freeFlowTravelTime) / 60)
+            : 0
+        };
+
+        // Fetch energy data using state name from air quality location
+        let energy = null;
         try {
-          trafficData = await getTrafficFlow(searchCity);
+          // Map common city names to their states for better matching
+          const cityToStateMap = {
+            'Delhi': 'Delhi',
+            'New Delhi': 'Delhi',
+            'Mumbai': 'Maharashtra',
+            'Bombay': 'Maharashtra',
+            'Bangalore': 'Karnataka',
+            'Bengaluru': 'Karnataka',
+            'Hyderabad': 'Telangana',
+            'Chennai': 'Tamil Nadu',
+            'Madras': 'Tamil Nadu',
+            'Kolkata': 'West Bengal',
+            'Calcutta': 'West Bengal',
+            'Pune': 'Maharashtra',
+            'Ahmedabad': 'Gujarat',
+            'Jaipur': 'Rajasthan',
+            'Surat': 'Gujarat',
+            'Lucknow': 'Uttar Pradesh',
+            'Kanpur': 'Uttar Pradesh',
+            'Nagpur': 'Maharashtra',
+            'Indore': 'Madhya Pradesh',
+            'Thane': 'Maharashtra',
+            'Bhopal': 'Madhya Pradesh',
+            'Visakhapatnam': 'Andhra Pradesh',
+            'Patna': 'Bihar',
+            'Vadodara': 'Gujarat',
+            'Ghaziabad': 'Uttar Pradesh',
+            'Ludhiana': 'Punjab',
+            'Agra': 'Uttar Pradesh',
+            'Nashik': 'Maharashtra',
+            'Faridabad': 'Haryana',
+            'Meerut': 'Uttar Pradesh',
+            'Rajkot': 'Gujarat',
+            'Varanasi': 'Uttar Pradesh',
+            'Srinagar': 'Jammu and Kashmir',
+            'Amritsar': 'Punjab',
+            'Chandigarh': 'Chandigarh'
+          };
+
+          // Try to get state name from map first, then from air quality data
+          const mappedState = cityToStateMap[searchCity] || cityToStateMap[searchCity.charAt(0).toUpperCase() + searchCity.slice(1).toLowerCase()];
+          const finalStateName = mappedState || stateName || searchCity;
+
+          console.log('Energy API - City:', searchCity, 'State:', finalStateName);
+          const energyData = await energyAPI.getEnergyDataByCity(searchCity, finalStateName);
+          console.log('Energy API Response:', energyData);
+          energy = transformEnergyData(energyData);
+          console.log('Transformed Energy Data:', energy);
         } catch (error) {
-          console.warn('Traffic data not available for this city, using mock data');
-          trafficData = {
-            currentSpeed: 35 + Math.floor(Math.random() * 25),
-            freeFlowSpeed: 60,
-            currentTravelTime: 600,
-            freeFlowTravelTime: 400
+          console.warn('Energy data not available, using fallback:', error);
+          energy = {
+            usage: 1200,
+            renewable: 40,
+            peak: 1500
           };
         }
 
         setSelectedCity(searchCity);
         setCityData({
           cityName: searchCity,
-          weather: {
-            temp: weatherData.temperature,
-            condition: weatherData.description,
-            humidity: weatherData.humidity,
-            windSpeed: weatherData.windSpeed,
-            feelsLike: weatherData.feelsLike,
-            pressure: weatherData.pressure
-          },
-          // Mock data for other features (until APIs are ready)
-          airQuality: {
-            aqi: 30 + Math.floor(Math.random() * 70),
-            status: 'Good',
-            pm25: 15 + Math.floor(Math.random() * 20),
-            pm10: 25 + Math.floor(Math.random() * 30)
-          },
-          traffic: {
-            congestionLevel: trafficData.freeFlowSpeed > 0 
-              ? Math.round((trafficData.currentSpeed / trafficData.freeFlowSpeed) * 100)
-              : 50,
-            avgSpeed: trafficData.currentSpeed || 35,
-            incidents: Math.floor(Math.random() * 5),
-            freeFlowSpeed: trafficData.freeFlowSpeed || 60,
-            delay: trafficData.currentTravelTime && trafficData.freeFlowTravelTime
-              ? Math.round((trafficData.currentTravelTime - trafficData.freeFlowTravelTime) / 60)
-              : 0
-          },
-          energy: {
-            usage: 1200 + Math.floor(Math.random() * 300),
-            renewable: 35 + Math.floor(Math.random() * 20),
-            peak: 1500 + Math.floor(Math.random() * 200)
-          },
+          weather,
+          airQuality,
+          traffic,
+          energy,
           waste: {
             collected: 450 + Math.floor(Math.random() * 100),
             recycled: 30 + Math.floor(Math.random() * 15),
