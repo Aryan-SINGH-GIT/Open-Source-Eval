@@ -87,9 +87,10 @@ const Dashboard = () => {
     if (searchCity.trim()) {
       setLoading(true);
       try {
-        // Import the weather and traffic APIs
+        // Import the weather, traffic, and waste APIs
         const { getCurrentWeather } = await import('../../services/weatherAPI');
         const { getTrafficFlow, getTrafficIncidents, getFallbackTrafficData } = await import('../../services/trafficAPI');
+        const { getWasteData } = await import('../../services/wasteAPI');
 
         // Fetch all data in parallel for better performance
         const [weatherData, airQualityData, trafficDataResult, trafficIncidentsResult] = await Promise.allSettled([
@@ -243,6 +244,19 @@ const Dashboard = () => {
           };
         }
 
+        // Fetch real waste management data
+        let wasteData;
+        try {
+          wasteData = await getWasteData(searchCity);
+        } catch (error) {
+          console.warn('Waste data not available for this city, using mock data');
+          wasteData = {
+            collectedToday: 450 + Math.floor(Math.random() * 100),
+            recyclingRate: 30 + Math.floor(Math.random() * 15),
+            nextCollection: 'Tomorrow, 6:00 AM'
+          };
+        }
+
         setSelectedCity(searchCity);
         setCityData({
           cityName: searchCity,
@@ -251,9 +265,13 @@ const Dashboard = () => {
           traffic,
           energy,
           waste: {
-            collected: 450 + Math.floor(Math.random() * 100),
-            recycled: 30 + Math.floor(Math.random() * 15),
-            nextCollection: 'Tomorrow, 6:00 AM'
+            collected: wasteData.collectedToday || 450,
+            recycled: wasteData.recyclingRate || 30,
+            nextCollection: wasteData.nextCollection || 'Tomorrow, 6:00 AM',
+            binFillLevel: wasteData.binFillLevel || 65,
+            dailyTarget: wasteData.dailyTarget || 10000,
+            collectionProgress: wasteData.collectionProgress || 75,
+            collectionStatus: wasteData.collectionStatus || 'Collection in progress'
           }
         });
       } catch (error) {
