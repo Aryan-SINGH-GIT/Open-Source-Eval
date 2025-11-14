@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import FeatureCard from '../../components/FeatureCard/FeatureCard';
 import WeatherWidget from '../../components/WeatherWidget/WeatherWidget';
@@ -6,6 +6,7 @@ import AirQualityWidget from '../../components/AirQualityWidget/AirQualityWidget
 import TrafficWidget from '../../components/TrafficWidget/TrafficWidget';
 import EnergyWidget from '../../components/EnergyWidget/EnergyWidget';
 import WasteWidget from '../../components/WasteWidget/WasteWidget';
+import DataVisualization from '../DataVisualization/DataVisualization';
 import { airQualityAPI, energyAPI } from '../../services/api';
 import './Dashboard.css';
 
@@ -408,6 +409,11 @@ const Dashboard = () => {
                 <WasteWidget data={cityData.waste} />
               </motion.div>
             </div>
+
+            {/* Data Visualization Section */}
+            <motion.div variants={itemVariants}>
+              <DataVisualization cityData={cityData} />
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
