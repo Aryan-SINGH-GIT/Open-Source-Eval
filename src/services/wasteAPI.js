@@ -24,7 +24,9 @@ const calculateWasteData = (city) => {
   const dayOfWeek = now.getDay(); // 0 = Sunday, 6 = Saturday
   
   // Calculate base daily waste (in tons)
-  const dailyWaste = cityInfo.population * cityInfo.wastePerPerson * 1000; // tons
+  // Population is in thousands, wastePerPerson is in kg/day
+  // Formula: (population in thousands × 1000 people × wastePerPerson kg) / 1000 = tons
+  const dailyWaste = cityInfo.population * cityInfo.wastePerPerson; // tons
   
   // Time-based collection progress
   let collectionProgress = 0;
