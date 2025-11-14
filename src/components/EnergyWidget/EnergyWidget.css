@@ -1,0 +1,96 @@
+.energy-widget {
+  background: var(--glass-bg);
+  backdrop-filter: blur(30px);
+  border: 1px solid var(--glass-border);
+  border-radius: 30px;
+  padding: 30px;
+  transition: all 0.4s ease;
+}
+
+.energy-main {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.energy-display {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.energy-value {
+  font-family: 'Orbitron', monospace;
+  font-size: 3.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--primary-blue), var(--accent-purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.energy-unit {
+  font-family: 'Orbitron', monospace;
+  font-size: 1.5rem;
+  color: var(--text-secondary);
+}
+
+.energy-subtitle {
+  font-size: 1rem;
+  color: var(--text-secondary);
+}
+
+.energy-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px;
+  background: rgba(10, 20, 40, 0.5);
+  border-radius: 20px;
+  border: 1px solid var(--glass-border);
+}
+
+.stat-icon {
+  font-size: 2rem;
+}
+
+.stat-content {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.renewable-bar {
+  padding-top: 20px;
+  border-top: 1px solid var(--glass-border);
+}
+
+.bar-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+}
+
+.bar-track {
+  height: 12px;
+  background: rgba(10, 20, 40, 0.5);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00ff88, #00d9ff);
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+}
