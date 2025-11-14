@@ -4,6 +4,9 @@ import { Canvas } from '@react-three/fiber';
 import { Sphere, MeshDistortMaterial, OrbitControls } from '@react-three/drei';
 import { motion, AnimatePresence } from 'framer-motion';
 import './Auth.css';
+import { doSignInWithEmailAndPassword, doSigtnInGoogle } from '../../firebase/auth';
+
+import { useAuth } from '../../contexts/authContext';
 
 const FloatingShapes = () => {
   return (
@@ -39,7 +42,7 @@ const FloatingShapes = () => {
 
 const Auth = () => {
   const navigate = useNavigate();
-  const [isLogin, setIsLogin] = useState(true);
+  const [isLogin, setIsLogin] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -49,7 +52,6 @@ const Auth = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Simulate authentication
     setTimeout(() => {
       navigate('/dashboard');
     }, 500);
