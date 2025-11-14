@@ -312,7 +312,7 @@ const Dashboard = () => {
     >
       <motion.header className="dashboard-header" variants={itemVariants}>
         <div className="header-content">
-          <h1 className="dashboard-title">Smart City Dashboard</h1>
+          <h1 className="dashboard-title">Citicore</h1>
           <p className="dashboard-subtitle">Monitor and analyze city data in real-time</p>
         </div>
       </motion.header>

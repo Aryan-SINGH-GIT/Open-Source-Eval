@@ -121,7 +121,7 @@ const Auth = () => {
         transition={{ duration: 0.6 }}
       >
         <div className="auth-header">
-          <h1 className="auth-logo">Smart City</h1>
+          <h1 className="auth-logo">Citicore</h1>
           <p className="auth-subtitle">Data Dashboard</p>
         </div>
 

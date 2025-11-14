@@ -166,7 +166,7 @@ const Landing = () => {
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            Smart City Data Insights
+            Citicore
           </motion.h1>
 
           <motion.p
