@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import WeatherCard from './components/WeatherCard'
+import TrafficCard from './components/TrafficCard'
 import './App.css'
 
 function App() {
@@ -18,7 +19,7 @@ function App() {
     <div className="app">
       <header className="app-header">
         <h1>🌆 Smart City Dashboard</h1>
-        <p>Real-time Weather Data</p>
+        <p>Real-time Weather & Traffic Data</p>
       </header>
 
       <div className="city-selector">
@@ -34,7 +35,10 @@ function App() {
         </form>
       </div>
 
-      <WeatherCard city={city} />
+      <div className="dashboard-grid">
+        <WeatherCard city={city} />
+        <TrafficCard city={city} />
+      </div>
 
       <div className="quick-cities">
         <p>Quick Select:</p>
@@ -42,6 +46,7 @@ function App() {
         <button onClick={() => setCity('Delhi')}>Delhi</button>
         <button onClick={() => setCity('Bangalore')}>Bangalore</button>
         <button onClick={() => setCity('Kolkata')}>Kolkata</button>
+        <button onClick={() => setCity('London')}>London</button>
       </div>
     </div>
   )

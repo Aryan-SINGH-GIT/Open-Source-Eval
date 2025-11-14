@@ -24,6 +24,14 @@
   opacity: 0.9;
 }
 
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
 .city-selector {
   max-width: 500px;
   margin: 0 auto 30px;
