@@ -1,0 +1,76 @@
+.traffic-chart-container {
+  background: var(--glass-bg);
+  backdrop-filter: blur(30px);
+  border: 1px solid var(--glass-border);
+  border-radius: 30px;
+  padding: 30px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s ease;
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.chart-title {
+  font-size: 1.5rem;
+  background: linear-gradient(135deg, var(--primary-blue), var(--accent-purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.chart-legend {
+  display: flex;
+  gap: 20px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--primary-blue);
+  box-shadow: 0 0 10px var(--primary-blue);
+}
+
+.chart-wrapper {
+  position: relative;
+  padding: 15px;
+  background: rgba(10, 20, 40, 0.3);
+  border-radius: 20px;
+  border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+.custom-tooltip {
+  background: rgba(10, 20, 40, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--primary-blue);
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+}
+
+.tooltip-label {
+  font-family: 'Orbitron', monospace;
+  color: var(--primary-blue);
+  font-size: 0.9rem;
+  margin-bottom: 5px;
+}
+
+.tooltip-value {
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-weight: 600;
+}

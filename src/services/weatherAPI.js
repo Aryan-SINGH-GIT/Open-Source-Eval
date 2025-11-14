@@ -17,7 +17,7 @@ export const getCurrentWeather = async (city) => {
     }
 
     const data = await response.json();
-    
+
     return {
       city: data.name,
       country: data.sys.country,
@@ -52,7 +52,7 @@ export const getWeatherForecast = async (city) => {
     }
 
     const data = await response.json();
-    
+
     return data.list.map(item => ({
       date: new Date(item.dt * 1000).toISOString(),
       temperature: Math.round(item.main.temp),
@@ -83,7 +83,7 @@ export const getWeatherByCoordinates = async (lat, lon) => {
     }
 
     const data = await response.json();
-    
+
     return {
       city: data.name,
       country: data.sys.country,
@@ -99,5 +99,58 @@ export const getWeatherByCoordinates = async (lat, lon) => {
   } catch (error) {
     console.error('Error fetching weather by coordinates:', error);
     throw error;
+  }
+};
+
+// Test functions
+export const testCurrentWeather = async () => {
+  console.log('🧪 Testing Current Weather API...');
+  try {
+    const data = await getCurrentWeather('Mumbai');
+    console.log('✅ Success:', data);
+    return data;
+  } catch (error) {
+    console.error('❌ Error:', error.message);
+    throw error;
+  }
+};
+
+export const testWeatherForecast = async () => {
+  console.log('🧪 Testing Weather Forecast API...');
+  try {
+    const data = await getWeatherForecast('Delhi');
+    console.log('✅ Success: Got', data.length, 'forecast entries');
+    console.log('First entry:', data[0]);
+    return data;
+  } catch (error) {
+    console.error('❌ Error:', error.message);
+    throw error;
+  }
+};
+
+export const testWeatherByCoordinates = async () => {
+  console.log('🧪 Testing Weather by Coordinates API...');
+  try {
+    const data = await getWeatherByCoordinates(19.0760, 72.8777);
+    console.log('✅ Success:', data);
+    return data;
+  } catch (error) {
+    console.error('❌ Error:', error.message);
+    throw error;
+  }
+};
+
+export const runAllTests = async () => {
+  console.log('🚀 Starting Weather API Tests...\n');
+  try {
+    await testCurrentWeather();
+    console.log('\n');
+    await testWeatherForecast();
+    console.log('\n');
+    await testWeatherByCoordinates();
+    console.log('\n');
+    console.log('✅ All tests passed!');
+  } catch (error) {
+    console.error('❌ Tests failed:', error.message);
   }
 };
