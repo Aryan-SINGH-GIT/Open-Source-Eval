@@ -42,22 +42,29 @@ const Dashboard = () => {
     }
   ];
 
-  const handleSearch = (e) => {
+  const handleSearch = async (e) => {
     e.preventDefault();
     if (searchCity.trim()) {
       setLoading(true);
-      // Simulate API call - Replace with actual API call later
-      setTimeout(() => {
+      try {
+        // Import the weather API
+        const { getCurrentWeather } = await import('../../services/weatherAPI');
+
+        // Fetch real weather data
+        const weatherData = await getCurrentWeather(searchCity);
+
         setSelectedCity(searchCity);
-        // Mock API response
         setCityData({
           cityName: searchCity,
           weather: {
-            temp: 22 + Math.floor(Math.random() * 10),
-            condition: ['Clear', 'Cloudy', 'Rainy', 'Sunny'][Math.floor(Math.random() * 4)],
-            humidity: 60 + Math.floor(Math.random() * 20),
-            windSpeed: 10 + Math.floor(Math.random() * 15)
+            temp: weatherData.temperature,
+            condition: weatherData.description,
+            humidity: weatherData.humidity,
+            windSpeed: weatherData.windSpeed,
+            feelsLike: weatherData.feelsLike,
+            pressure: weatherData.pressure
           },
+          // Mock data for other features (until APIs are ready)
           airQuality: {
             aqi: 30 + Math.floor(Math.random() * 70),
             status: 'Good',
@@ -80,8 +87,12 @@ const Dashboard = () => {
             nextCollection: 'Tomorrow, 6:00 AM'
           }
         });
+      } catch (error) {
+        console.error('Error fetching city data:', error);
+        alert(`Failed to fetch data for ${searchCity}. Please check the city name and try again.`);
+      } finally {
         setLoading(false);
-      }, 1000);
+      }
     }
   };
 

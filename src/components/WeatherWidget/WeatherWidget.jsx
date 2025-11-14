@@ -4,13 +4,14 @@ import './WeatherWidget.css';
 
 const WeatherWidget = ({ weather, cityName }) => {
   const getWeatherIcon = (condition) => {
-    const icons = {
-      'Clear': '☀️',
-      'Cloudy': '☁️',
-      'Rainy': '🌧️',
-      'Sunny': '🌞'
-    };
-    return icons[condition] || '🌤️';
+    const conditionLower = condition?.toLowerCase() || '';
+    if (conditionLower.includes('clear') || conditionLower.includes('sunny')) return '☀️';
+    if (conditionLower.includes('cloud')) return '☁️';
+    if (conditionLower.includes('rain')) return '🌧️';
+    if (conditionLower.includes('snow')) return '❄️';
+    if (conditionLower.includes('thunder') || conditionLower.includes('storm')) return '⛈️';
+    if (conditionLower.includes('mist') || conditionLower.includes('fog')) return '🌫️';
+    return '🌤️';
   };
 
   return (
@@ -52,7 +53,19 @@ const WeatherWidget = ({ weather, cityName }) => {
           {weather.windSpeed && (
             <div className="detail-item">
               <span className="detail-label">Wind Speed</span>
-              <span className="detail-value">{weather.windSpeed} km/h</span>
+              <span className="detail-value">{weather.windSpeed} m/s</span>
+            </div>
+          )}
+          {weather.feelsLike && (
+            <div className="detail-item">
+              <span className="detail-label">Feels Like</span>
+              <span className="detail-value">{weather.feelsLike}°C</span>
+            </div>
+          )}
+          {weather.pressure && (
+            <div className="detail-item">
+              <span className="detail-label">Pressure</span>
+              <span className="detail-value">{weather.pressure} hPa</span>
             </div>
           )}
         </div>
