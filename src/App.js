@@ -1,34 +1,49 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import WeatherCard from './components/WeatherCard'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [city, setCity] = useState('Mumbai')
+  const [inputCity, setInputCity] = useState('')
+
+  const handleCityChange = (e) => {
+    e.preventDefault()
+    if (inputCity.trim()) {
+      setCity(inputCity.trim())
+      setInputCity('')
+    }
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="app">
+      <header className="app-header">
+        <h1>🌆 Smart City Dashboard</h1>
+        <p>Real-time Weather Data</p>
+      </header>
+
+      <div className="city-selector">
+        <form onSubmit={handleCityChange}>
+          <input
+            type="text"
+            placeholder="Enter city name..."
+            value={inputCity}
+            onChange={(e) => setInputCity(e.target.value)}
+            className="city-input"
+          />
+          <button type="submit" className="search-btn">Search</button>
+        </form>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
+
+      <WeatherCard city={city} />
+
+      <div className="quick-cities">
+        <p>Quick Select:</p>
+        <button onClick={() => setCity('Mumbai')}>Mumbai</button>
+        <button onClick={() => setCity('Delhi')}>Delhi</button>
+        <button onClick={() => setCity('Bangalore')}>Bangalore</button>
+        <button onClick={() => setCity('Kolkata')}>Kolkata</button>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    </div>
   )
 }
 
